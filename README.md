@@ -6,13 +6,13 @@
 
 Make use of the https://github.com/fusesource/stompjms library to add STOMP support to the lower level http://activemq.apache.org library.
 
-`build.gradle`
+##### build.gradle
 ```
 compile (group: 'org.apache.activemq', name: 'activemq-client', version: '5.15.0')
 compile group: 'org.fusesource.stompjms', name: 'stompjms-client', version: '1.19'
 ```
 
-`src/main/java/darwinStomp/StompClient`
+##### src/main/java/darwinStomp/StompClient
 ``` java
 package darwinStomp;
 
@@ -79,7 +79,7 @@ public class StompClient implements Runnable {
 }
 ```
 
-`src/main/java/darwinStomp/MessageHandler`
+##### src/main/java/darwinStomp/MessageHandler
 ``` java
 package darwinStomp;
 
