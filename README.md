@@ -16,22 +16,32 @@ compile group: 'org.fusesource.stompjms', name: 'stompjms-client', version: '1.1
 ``` java
 package darwinStomp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.Queue;
+import javax.jms.Session;
 import org.fusesource.stomp.jms.StompJmsConnectionFactory;
-import javax.jms.*;
 
 public class StompClient implements Runnable {
 
-    public static void main(String[] args) throws Exception {
+    private static final Logger LOG = Logger.getLogger(StompClient.class.getName());
+
+    private final String BROKER_URI = "tcp://datafeeds.nationalrail.co.uk:61613";
+    private final String QUEUE_NAME = "Your security key from My Feeds";
+
+    public static void main(String[] args) {
         new StompClient().run();
     }
 
     @Override
     public void run() {
-        String brokerUri = "tcp://datafeeds.nationalrail.co.uk:61613";
-        String QUEUE_NAME = "Your security key from My Feeds"
 
         StompJmsConnectionFactory connectionFactory = new StompJmsConnectionFactory();
-        connectionFactory.setBrokerURI(brokerUri);
+
+        connectionFactory.setBrokerURI(this.BROKER_URI);
 
         Connection connection = null;
         Session session = null;
@@ -39,44 +49,47 @@ public class StompClient implements Runnable {
 
         try {
             connection = connectionFactory.createConnection("d3user", "d3password");
-            connection.start();
 
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Queue queue = session.createQueue(QUEUE_NAME);
+            Queue queue = session.createQueue(this.QUEUE_NAME);
             consumer = session.createConsumer(queue);
 
-            System.out.println("Connected to STOMP " + brokerUri);
+            System.out.println("Connected to STOMP " + this.BROKER_URI);
 
             consumer.setMessageListener(new MessageHandler());
 
-            while (!Thread.interrupted()) {}
-
-            try {
-                if (consumer != null) {
-                    consumer.close();
-                }
-
-                if (session != null) {
-                    session.close();
-                }
-
-                if (connection != null) {
-                    connection.close();
-                    connection = null;
-                }
-            } catch (JMSException ex) {
-                System.out.println("Got exception on shutdown");
-                ex.printStackTrace();
+            while (!Thread.interrupted()) {
             }
 
-            System.out.println("Thread was interrupted!");
-
-
-        } catch (JMSException e) {
-            e.printStackTrace();
+        } catch (JMSException ex) {
+            Logger.getLogger(StompClient.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Thread interupted by exception or shutdown");
+        } finally {
+            if (consumer != null) {
+                try {
+                    consumer.close();
+                } catch (JMSException ex) {
+                    LOG.log(Level.SEVERE, null, ex);
+                }
+            }
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (JMSException ex) {
+                    LOG.log(Level.SEVERE, null, ex);
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (JMSException ex) {
+                    LOG.log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
 }
+
 ```
 
 ##### src/main/java/darwinStomp/MessageHandler
