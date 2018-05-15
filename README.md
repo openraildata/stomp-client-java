@@ -12,6 +12,20 @@ compile (group: 'org.apache.activemq', name: 'activemq-client', version: '5.15.0
 compile group: 'org.fusesource.stompjms', name: 'stompjms-client', version: '1.19'
 ```
 
+##### Maven Dependancies
+```
+<dependency>
+    <groupId>javax.jms</groupId>
+    <artifactId>jms-api</artifactId>
+    <version>1.1-rev-1</version>
+</dependency>
+<dependency>
+    <groupId>org.fusesource.stompjms</groupId>
+    <artifactId>stompjms-client</artifactId>
+    <version>1.19</version>
+</dependency>
+```
+
 ##### src/main/java/darwinStomp/StompClient
 ``` java
 package darwinStomp;
